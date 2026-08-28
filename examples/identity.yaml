@@ -1,0 +1,26 @@
+name: "示例"
+
+north_star: "把模糊的焦虑，变成看得见的一天。"
+
+values:
+  - 先完成最小的真东西
+  - 不把模型和订阅当成身份
+
+goals:
+  - id: deep-work
+    title: 每周至少 4 个被自己承认的深度工作日
+    why: 我不想只在工具之间切换，却说不出作品是什么
+    horizon: 90d
+    status: active
+    signals:
+      - 有提交或可演示的结果
+      - 日报里能写出「做完了」而不是「打开过」
+
+projects:
+  - name: who-am-i
+    path: .
+    goal_ids: [deep-work]
+
+not_doing:
+  - 同时开四个 agent 却没有主线
+  - 用凌晨补工证明自己认真
