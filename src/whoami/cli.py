@@ -116,6 +116,18 @@ def paths() -> None:
 
 
 @app.command()
+def serve(
+    host: str = typer.Option("127.0.0.1", help="绑定地址"),
+    port: int = typer.Option(8787, help="端口"),
+) -> None:
+    """打开本机日报面板。"""
+    from whoami.web.server import serve as run_server
+
+    console.print(f"打开 http://{host}:{port} 查看日报。")
+    run_server(host, port)
+
+
+@app.command()
 def version() -> None:
     console.print(__version__)
 

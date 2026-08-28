@@ -63,3 +63,19 @@ def load_facts(day: date) -> DayFacts | None:
     if not row:
         return None
     return DayFacts.model_validate(json.loads(row[0]))
+
+
+def load_report(day: date) -> DailyReport | None:
+    con = connect()
+    row = con.execute("SELECT report_json FROM days WHERE date = ?", (day.isoformat(),)).fetchone()
+    con.close()
+    if not row or not row[0]:
+        return None
+    return DailyReport.model_validate(json.loads(row[0]))
+
+
+def list_days() -> list[str]:
+    con = connect()
+    rows = con.execute("SELECT date FROM days ORDER BY date DESC").fetchall()
+    con.close()
+    return [r[0] for r in rows]

@@ -62,10 +62,19 @@ wai init          # 生成本机说明书和设置
 $EDITOR "$(wai paths | awk '/identity/{print $2}')"
 wai scan          # 只看今天采集到了什么
 wai today         # 写出日报
+wai serve         # 打开本机日报面板 http://127.0.0.1:8787
 wai who           # 读你写下的自己
 ```
 
 日报会写到本机数据目录（`wai paths` 可查看），同时打印在终端。
+
+### 日报面板
+
+`wai serve` 会打开一个本机 HTML 页：工具图标、工作时长、token、时间线、五段日报。第一次进去是写进产品里的**示例日**，用来看成品长什么样；点「本机数据」才读你自己的采集结果。
+
+面板源码在 `src/whoami/web/static/index.html`，不依赖外网，也可以直接用浏览器打开这份 HTML 看示例。
+
+![Who Am I 日报面板示例](docs/dashboard-preview.jpg)
 
 每晚自动跑一次：
 
@@ -133,10 +142,10 @@ llm_model: "llama3.1"
 
 - [x] Claude Code / Codex / Grok Build / Cursor / Git 采集器骨架
 - [x] 本机说明书 + 规则日报 + 可选 LLM
-- [x] CLI：`init` / `scan` / `today` / `who`
+- [x] CLI：`init` / `scan` / `today` / `who` / `serve`
+- [x] 本机日报面板（工具图标、时长、示例日）
 - [ ] 更稳的 Cursor 官方/非官方用量对接
 - [ ] ActivityWatch 窗口标题（可选）
-- [ ] 本地 Web 晚间仪式页
 - [ ] 周报：这周有没有对准北极星
 - [ ] 插件规范：第三方采集器
 - [ ] 桌面托盘「现在在做什么」

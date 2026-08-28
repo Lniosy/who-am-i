@@ -42,6 +42,9 @@ Issues = "https://github.com/Lniosy/who-am-i/issues"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+whoami = ["web/static/*"]
+
 [tool.ruff]
 line-length = 100
 target-version = "py311"
