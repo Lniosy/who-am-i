@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Who Am I · 看清自己每天在做什么</title>
+  <meta name="description" content="Local-first 的晚间日报。读取本机 Claude Code、Codex、Grok Build、Cursor 和 Git 痕迹，写成一份人话日报。数据不出这台电脑。" />
+  <meta property="og:title" content="Who Am I" />
+  <meta property="og:description" content="看清自己每天在做什么。不必焦虑。知道自己到底有没有为之努力。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://lniosy.github.io/who-am-i/" />
+  <meta property="og:image" content="https://lniosy.github.io/who-am-i/dashboard-preview.jpg" />
+  <link rel="canonical" href="https://lniosy.github.io/who-am-i/" />
+  <style>
+    :root {
+      --bg: #f4efe6;
+      --paper: #fffaf3;
+      --ink: #1c1915;
+      --muted: #6f675c;
+      --line: #e6ddd0;
+      --good: #3c6e50;
+      --warm: #c45c26;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 18px/1.6 "Iowan Old Style", "Palatino Linotype", Palatino, "Songti SC", serif;
+    }
+    a { color: inherit; }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+    header.nav {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 22px 0 8px; gap: 16px; flex-wrap: wrap;
+    }
+    .brand {
+      font: 13px/1 ui-sans-serif, system-ui, sans-serif;
+      letter-spacing: .2em; text-transform: uppercase; color: var(--muted);
+    }
+    .nav-links { display: flex; gap: 18px; font: 14px ui-sans-serif, system-ui, sans-serif; }
+    .nav-links a { text-decoration: none; color: var(--muted); }
+    .nav-links a:hover { color: var(--ink); }
+    .hero { padding: 56px 0 28px; }
+    .kicker {
+      font: 12px ui-sans-serif, system-ui, sans-serif;
+      letter-spacing: .16em; text-transform: uppercase; color: var(--muted);
+    }
+    h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 600; letter-spacing: -.03em;
+      line-height: 1.15; margin: 10px 0 18px;
+    }
+    .lede { font-size: 20px; color: var(--muted); max-width: 38em; margin: 0 0 28px; }
+    .cta { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .btn {
+      display: inline-block; text-decoration: none;
+      border-radius: 999px; padding: 10px 18px;
+      font: 14px/1 ui-sans-serif, system-ui, sans-serif;
+      border: 1px solid var(--ink); background: var(--ink); color: var(--paper);
+    }
+    .btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+    .shot {
+      margin: 36px 0 8px; background: var(--paper);
+      border: 1px solid var(--line); border-radius: 20px; overflow: hidden;
+    }
+    .shot img { display: block; width: 100%; height: auto; }
+    .caption {
+      font: 13px ui-sans-serif, system-ui, sans-serif;
+      color: var(--muted); margin: 10px 0 48px;
+    }
+    h2 { font-size: 28px; font-weight: 600; letter-spacing: -.02em; margin: 0 0 14px; }
+    section { padding: 12px 0 40px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .card {
+      background: var(--paper); border: 1px solid var(--line);
+      border-radius: 18px; padding: 22px 24px;
+    }
+    .card h3 { margin: 0 0 8px; font-size: 18px; }
+    .card p { margin: 0; color: var(--muted); font-size: 16px; }
+    table {
+      width: 100%; border-collapse: collapse; background: var(--paper);
+      border: 1px solid var(--line); border-radius: 18px; overflow: hidden;
+      font: 15px/1.5 ui-sans-serif, system-ui, sans-serif;
+    }
+    th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { color: var(--muted); font-weight: 500; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+    tr:last-child td { border-bottom: 0; }
+    pre {
+      background: #1c1915; color: #f4efe6; border-radius: 16px;
+      padding: 18px 20px; overflow-x: auto;
+      font: 13px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    ol.principles { padding-left: 20px; }
+    ol.principles li { margin: 8px 0; }
+    footer {
+      padding: 28px 0 56px; color: var(--muted);
+      font: 13px ui-sans-serif, system-ui, sans-serif;
+      display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    }
+    @media (max-width: 800px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      h1 { font-size: 36px; }
+      .hero { padding-top: 28px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="nav">
+      <div class="brand">Who Am I</div>
+      <nav class="nav-links">
+        <a href="#why">为什么</a>
+        <a href="#how">怎么做</a>
+        <a href="#start">开始</a>
+        <a href="https://github.com/Lniosy/who-am-i">GitHub</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="kicker">Local-first · 晚间日报</div>
+      <h1>看清自己每天<br />在做什么。</h1>
+      <p class="lede">
+        不必焦虑。知道自己到底有没有为之努力。
+        Who Am I 读取你电脑上已经存在的 AI 编程痕迹，写成一份人话日报。
+        默认情况下，提示词、源码、密钥都不会离开这台电脑。
+      </p>
+      <div class="cta">
+        <a class="btn" href="https://github.com/Lniosy/who-am-i">打开仓库</a>
+        <a class="btn ghost" href="#start">安装命令</a>
+      </div>
+    </section>
+
+    <figure class="shot">
+      <img src="./dashboard-preview.jpg" width="1600" height="980" alt="Who Am I 日报面板：今天的自己、工具时长、时间线和五段日报" />
+    </figure>
+    <p class="caption">本机日报窗口。时长是有痕迹的时间窗，不是墙钟打卡。示例日用来看成品，不会冒充你的一天。</p>
+
+    <section id="why">
+      <h2>两种相反的焦虑</h2>
+      <div class="grid-2">
+        <article class="card">
+          <h3>烧了很多 token</h3>
+          <p>工具一直在转，晚上却说不清今天做成了什么。用量榜把活跃度当成了自我价值。</p>
+        </article>
+        <article class="card">
+          <h3>没怎么打开工具</h3>
+          <p>日历是空的，于是觉得自己荒废了一天。空白并不会自动等于偷懒。</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="how">
+      <h2>证据、身份、叙述分开</h2>
+      <table>
+        <thead>
+          <tr><th>层</th><th>问题</th><th>数据从哪来</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>事实</td><td>用了哪些工具、多久、提交了什么</td><td>本机会话日志、Git</td></tr>
+          <tr><td>身份</td><td>我想要什么、正在追什么、明确不做什么</td><td>你写的 identity.yaml</td></tr>
+          <tr><td>叙述</td><td>今天如何理解自己</td><td>本地规则，或你自己的模型</td></tr>
+        </tbody>
+      </table>
+      <p class="caption" style="margin-top:14px">打开过不等于做完了。完成项看提交和交付，会话只是痕迹。</p>
+    </section>
+
+    <section>
+      <h2>现在能读哪些工具</h2>
+      <table>
+        <thead>
+          <tr><th>工具</th><th>本机来源</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Claude Code</td><td>~/.claude/projects/**/*.jsonl</td></tr>
+          <tr><td>Codex</td><td>~/.codex/sessions/**/*.jsonl</td></tr>
+          <tr><td>Grok Build</td><td>~/.grok/sessions/…/summary.json 与 updates.jsonl</td></tr>
+          <tr><td>Cursor</td><td>~/.cursor/chats 与 ai-tracking</td></tr>
+          <tr><td>Git</td><td>说明书里登记的仓库，或当前目录</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="start">
+      <h2>在自己的电脑上跑</h2>
+      <p class="lede" style="font-size:16px">需要 Bun。独立窗口另外需要一次 Rust 工具链，用来编 Tauri。</p>
+<pre>git clone https://github.com/Lniosy/who-am-i.git
+cd who-am-i
+bun install
+bun run wai init
+bun run wai today
+bun run wai serve          # 浏览器 http://127.0.0.1:8787
+bun run app                # 独立日报窗口</pre>
+    </section>
+
+    <section>
+      <h2>设计原则</h2>
+      <ol class="principles">
+        <li>本机优先。默认可离线。云是可选项，不是前提。</li>
+        <li>采集失败不能毁掉仪式。某一个工具日志格式变了，其它部分仍要能出日报。</li>
+        <li>降低焦虑，不制造羞耻。禁止「你今天不够努力」这种审判。</li>
+        <li>证据与叙事分离。token、时长是事实；「这意味着什么」才是产品。</li>
+        <li>用户拥有对自己的定义。目标、价值观、不做什么，只能由本人写。</li>
+      </ol>
+    </section>
+
+    <footer>
+      <span>MIT · Lniosy · 数据默认留在本机</span>
+      <span><a href="https://github.com/Lniosy/who-am-i">github.com/Lniosy/who-am-i</a></span>
+    </footer>
+  </div>
+</body>
+</html>

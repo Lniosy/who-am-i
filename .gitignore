@@ -11,3 +11,6 @@ build/
 *.db
 .env
 .DS_Store
+node_modules/
+target/
+apps/desktop/src-tauri/binaries/

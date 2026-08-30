@@ -1,0 +1,19 @@
+{
+  "name": "who-am-i",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Local-first daily self-knowledge for people who build with AI tools.",
+  "homepage": "https://lniosy.github.io/who-am-i/",
+  "type": "module",
+  "workspaces": ["packages/*", "apps/*"],
+  "scripts": {
+    "wai": "bun run packages/cli/src/cli.ts",
+    "test": "bun test packages/core",
+    "dev": "bun run packages/cli/src/cli.ts serve",
+    "app": "bun run --cwd apps/desktop tauri dev",
+    "build:app": "bun run --cwd apps/desktop tauri build"
+  },
+  "bin": {
+    "wai": "packages/cli/src/cli.ts"
+  }
+}

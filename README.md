@@ -2,16 +2,20 @@
 
 **看清自己每天在做什么。不必焦虑。知道自己到底有没有为之努力。**
 
+官网：[lniosy.github.io/who-am-i](https://lniosy.github.io/who-am-i/)
+
 Who Am I 是一个 **local-first** 的开源自我认知工具。它读取你电脑上已经存在的 AI 编程工具痕迹（Grok Build、Cursor、Codex、Claude Code），再加上 Git 提交，在每天结束时写成一份人话日报：
 
 - 今天做完了什么
+- 留下了哪些痕迹（打开过 ≠ 做完了）
 - 不必担心什么
 - 明天先做什么
 - 这些事和你想成为的人、正在追的目标对齐吗
-- 有没有留下「努力过」的证据
 
 它不是又一块 token 看板。  
-[aiusage](https://github.com/juliantanx/aiusage)、[ccusage](https://ccusage.com/)、[vibe-coding-tracker](https://pypi.org/project/vibe-coding-tracker/) 已经把用量统计做得很好。Who Am I 站在它们上面一层：**把用量翻译成自我理解。**
+[aiusage](https://github.com/juliantanx/aiusage)、[ccusage](https://ccusage.com/)、[vibe-coding-tracker](https://github.com/Mai0313/VibeCodingTracker) 已经把用量统计做得很好。Who Am I 站在它们上面一层：**把用量翻译成自我理解。**
+
+运行时是 TypeScript（Bun）。日报面板是独立的 Tauri 窗口，也可以用浏览器打开同一套页面。
 
 ---
 
@@ -37,42 +41,46 @@ Who Am I 把证据、目标和叙述分开：
 
 ## 现在能读哪些工具
 
-| 工具 | 本机来源 | MVP 能拿到什么 |
+| 工具 | 本机来源 | 能拿到什么 |
 | --- | --- | --- |
 | Claude Code | `~/.claude/projects/**/*.jsonl` | 会话、时间窗、token、用户意图摘要、触及的文件 |
-| Codex | `~/.codex/sessions/**/*.jsonl` | 同上 |
-| Grok Build | `~/.grok/sessions/` | 同上 |
-| Cursor | `~/.cursor/chats/**/store.db` | 会话与提示摘要（官方个人用量 API 仍有限） |
-| Git | 你在说明书里登记的仓库 / 当前目录 | 提交数、说明、增删行 |
+| Codex | `~/.codex/sessions/**/*.jsonl` | 同上；项目名来自会话里的 cwd，不是日期文件夹 |
+| Grok Build | `~/.grok/sessions/<项目>/<会话>/summary.json` + `updates.jsonl` | 标题、时间戳、累计 token、用户原话 |
+| Cursor | `~/.cursor/chats/**/meta.json`、`~/.cursor/ai-tracking/ai-code-tracking.db` | 会话与改动痕迹（官方个人用量 API 仍有限） |
+| Git | 说明书里登记的仓库 / 当前目录 | 提交数、说明、增删行 |
 
-采集器是插件式的。读不到的工具会静默跳过，不会把一天搞砸。
+采集器是插件式的。读不到的工具会静默跳过，警告会写进面板，不会把一天搞砸。
+
+时长按时间戳聚类（中间大段发呆会切开）。多工具并行时，面板上的总时长只计一次。
 
 ---
 
 ## 快速开始
 
+需要 [Bun](https://bun.sh)。桌面窗口另外需要 Rust（第一次 `bun run app` 时 Tauri 会用到）。
+
 ```bash
 git clone https://github.com/Lniosy/who-am-i.git
 cd who-am-i
-python -m venv .venv
-source .venv/bin/activate
-pip install -e .
+bun install
 
-wai init          # 生成本机说明书和设置
-$EDITOR "$(wai paths | awk '/identity/{print $2}')"
-wai scan          # 只看今天采集到了什么
-wai today         # 写出日报
-wai serve         # 打开本机日报面板 http://127.0.0.1:8787
-wai who           # 读你写下的自己
+bun run wai init
+$EDITOR "$(bun run wai paths | awk '/identity/{print $2}')"
+bun run wai scan
+bun run wai today
+bun run wai serve          # 浏览器 http://127.0.0.1:8787
+bun run app                # 独立日报窗口
 ```
 
-日报会写到本机数据目录（`wai paths` 可查看），同时打印在终端。
+也可以：
 
-### 日报面板
+```bash
+bun packages/cli/src/cli.ts today
+```
 
-`wai serve` 会打开一个本机 HTML 页：工具图标、工作时长、token、时间线、五段日报。第一次进去是写进产品里的**示例日**，用来看成品长什么样；点「本机数据」才读你自己的采集结果。
+日报写到本机数据目录（`bun run wai paths` 可查看），同时打印在终端。
 
-面板源码在 `src/whoami/web/static/index.html`，不依赖外网，也可以直接用浏览器打开这份 HTML 看示例。
+面板第一次打开是**本机数据**。这一天还没生成过日报时，是空状态，不会拿示例日冒充你的一天。示例日在按钮里，用来看成品长什么样。
 
 ![Who Am I 日报面板示例](docs/dashboard-preview.jpg)
 
@@ -80,7 +88,7 @@ wai who           # 读你写下的自己
 
 ```bash
 # crontab -e
-30 21 * * * $HOME/.local/bin/wai today
+30 21 * * * /Users/你/.bun/bin/bun /path/to/who-am-i/packages/cli/src/cli.ts today
 ```
 
 ---
@@ -98,9 +106,9 @@ values:
   - Token 消耗不等于自我价值
 
 goals:
-  - id: ship-whoami
-    title: 做出 Who Am I 的可用 MVP
-    why: 减少「我今天到底有没有做事」的焦虑
+  - id: this-season
+    title: 把这一季最重要的那件事，做成能演示的最小版本
+    why: 不想只在工具之间切换，却说不出作品是什么
     horizon: 90d
     status: active
 
@@ -140,15 +148,15 @@ llm_model: "llama3.1"
 
 ## 路线图
 
-- [x] Claude Code / Codex / Grok Build / Cursor / Git 采集器骨架
+- [x] Claude Code / Codex / Grok Build / Cursor / Git 采集器（按本机真实格式）
 - [x] 本机说明书 + 规则日报 + 可选 LLM
 - [x] CLI：`init` / `scan` / `today` / `who` / `serve`
-- [x] 本机日报面板（工具图标、时长、示例日）
+- [x] 独立日报窗口（Tauri）
 - [ ] 更稳的 Cursor 官方/非官方用量对接
 - [ ] ActivityWatch 窗口标题（可选）
 - [ ] 周报：这周有没有对准北极星
 - [ ] 插件规范：第三方采集器
-- [ ] 桌面托盘「现在在做什么」
+- [ ] 菜单栏托盘「现在在做什么」
 
 ---
 

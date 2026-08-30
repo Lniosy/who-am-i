@@ -1,0 +1,39 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Who Am I",
+  "version": "0.1.0",
+  "identifier": "com.lniosy.whoami",
+  "build": {
+    "beforeDevCommand": "bun run ../../packages/cli/src/cli.ts serve --port 18787",
+    "devUrl": "http://127.0.0.1:18787",
+    "beforeBuildCommand": "bun build --compile ../../packages/cli/src/cli.ts --outfile src-tauri/binaries/wai && mkdir -p dist && cp ../../packages/cli/web/index.html dist/index.html",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "Who Am I",
+        "width": 1180,
+        "height": 860,
+        "minWidth": 800,
+        "minHeight": 600
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "resources": ["binaries/wai"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  }
+}

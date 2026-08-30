@@ -1,0 +1,15 @@
+{
+  "name": "@whoami/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "wai": "./src/cli.ts"
+  },
+  "scripts": {
+    "start": "bun run src/cli.ts",
+    "serve": "bun run src/cli.ts serve"
+  },
+  "dependencies": {
+    "@whoami/core": "workspace:*"
+  }
+}
