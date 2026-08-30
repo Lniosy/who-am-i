@@ -88,7 +88,7 @@ bun packages/cli/src/cli.ts today
 
 ```bash
 # crontab -e
-30 21 * * * /Users/你/.bun/bin/bun /path/to/who-am-i/packages/cli/src/cli.ts today
+30 21 * * * $HOME/.bun/bin/bun /path/to/who-am-i/packages/cli/src/cli.ts today
 ```
 
 ---

@@ -44,3 +44,4 @@ bun test packages/core
 - 把用户会话上传到项目自己的服务器
 - 用「效率分数」给人格打分
 - 在 README 里承诺官方 API 其实并不存在
+- 把本机真实日报、identity.yaml、会话 jsonl、数据库推进 Git。测试只用脱敏 fixture 或 `examples/`

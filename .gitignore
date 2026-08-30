@@ -7,10 +7,16 @@ build/
 *.egg-info/
 .pytest_cache/
 .ruff_cache/
-.whoami/
-*.db
-.env
 .DS_Store
 node_modules/
 target/
 apps/desktop/src-tauri/binaries/
+
+# 本机仪式数据，禁止进仓库
+.whoami/
+*.db
+.env
+reports/
+/identity.yaml
+/settings.yaml
+scripts/tmp/

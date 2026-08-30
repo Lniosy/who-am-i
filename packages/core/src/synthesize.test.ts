@@ -29,7 +29,7 @@ describe("rules report", () => {
     facts.sessions = [
       {
         tool: "grok-build",
-        session_id: "01a0523a-b3ce-7d21-8e62-aebd8d2f8c60",
+        session_id: "00000000-0000-4000-8000-000000000001",
         project: "who-am-i",
         started_at: "2026-08-28T10:00:00Z",
         ended_at: "2026-08-28T11:00:00Z",
@@ -38,7 +38,7 @@ describe("rules report", () => {
         user_prompts: [],
         files_touched: [],
         tools_used: [],
-        title: "01a0523a-b3ce-7d21-8e62-aebd8d2f8c60",
+        title: "00000000-0000-4000-8000-000000000001",
         hours: 0.4,
       } satisfies SessionEvent,
       {
@@ -70,7 +70,7 @@ describe("rules report", () => {
     const report = viaRules(facts, identity);
     const blob = report.finished.join(" ");
     expect(blob).toContain("who-am-i");
-    expect(blob).not.toContain("01a0523a");
+    expect(blob).not.toContain("00000000-0000-4000-8000-000000000001");
     expect(report.traces.join(" ")).toContain("写采集器");
     expect(report.alignment).toContain("同向");
   });
