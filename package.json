@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "description": "Local-first daily self-knowledge for people who build with AI tools.",
-  "homepage": "https://who-am-i.vercel.app",
+  "homepage": "https://who-am-i-cli.vercel.app",
   "type": "module",
   "workspaces": ["packages/*", "apps/*"],
   "scripts": {
