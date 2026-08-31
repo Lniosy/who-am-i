@@ -25,11 +25,23 @@ function json(data: unknown, status = 200): Response {
   });
 }
 
+function isAddrInUse(err: unknown): boolean {
+  const msg = err instanceof Error ? err.message : String(err);
+  return /EADDRINUSE|address already in use|in use/i.test(msg);
+}
+
+function openBrowser(url: string): void {
+  const cmd = process.platform === "darwin" ? "open" : process.platform === "win32" ? "cmd" : "xdg-open";
+  const args = process.platform === "win32" ? ["/c", "start", "", url] : [url];
+  try {
+    Bun.spawn([cmd, ...args], { stdout: "ignore", stderr: "ignore", stdin: "ignore" });
+  } catch {
+    /* 打开失败就让用户自己点链接 */
+  }
+}
+
 export async function serve(host = "127.0.0.1", port = 8787): Promise<void> {
-  const server = Bun.serve({
-    hostname: host,
-    port,
-    async fetch(req) {
+  const fetchHandler = async (req: Request): Promise<Response> => {
       const url = new URL(req.url);
       const path = url.pathname;
       if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: json({}).headers });
@@ -76,9 +88,29 @@ export async function serve(host = "127.0.0.1", port = 8787): Promise<void> {
         });
       }
       return new Response("not found", { status: 404 });
-    },
-  });
-  console.log(`Who Am I  →  http://${host}:${server.port}`);
+  };
+
+  let server: ReturnType<typeof Bun.serve> | null = null;
+  let used = port;
+  for (let i = 0; i < 10; i++) {
+    try {
+      server = Bun.serve({ hostname: host, port: used, fetch: fetchHandler });
+      break;
+    } catch (err) {
+      if (!isAddrInUse(err)) throw err;
+      used += 1;
+    }
+  }
+  if (!server) {
+    console.error(`端口 ${port}–${port + 9} 都被占用了。先关掉旧进程，或指定：wai serve --port 9887`);
+    process.exit(1);
+  }
+
+  const url = `http://${host}:${server.port}`;
+  if (used !== port) console.log(`端口 ${port} 已被占用，改用 ${used}。`);
+  console.log(`Who Am I  →  ${url}`);
+  console.log("这个终端要一直开着。关掉之后浏览器就打不开。");
+  openBrowser(url);
 }
 
 export function defaultDay(): string {

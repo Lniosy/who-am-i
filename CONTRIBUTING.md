@@ -7,7 +7,7 @@ bun install
 bun run wai init
 bun run wai scan
 bun run wai today
-bun run wai serve          # 浏览器打开 http://127.0.0.1:8787
+bun run wai serve          # 启动本机面板，终端保持开着
 bun run app                # Tauri 独立窗口
 ```
 

@@ -68,7 +68,7 @@ bun run wai init
 $EDITOR "$(bun run wai paths | awk '/identity/{print $2}')"
 bun run wai scan
 bun run wai today
-bun run wai serve          # 浏览器 http://127.0.0.1:8787
+bun run wai serve          # 先启动本机面板，终端要一直开着；会自动打开 http://127.0.0.1:8787
 bun run app                # 独立日报窗口
 ```
 
