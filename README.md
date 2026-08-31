@@ -176,7 +176,7 @@ Who Am I **不打算**再实现一遍 20 个工具的 token 解析精度。欢�
 
 ## 官网
 
-静态页在 `site/`。正式站走 [Vercel](https://who-am-i.vercel.app)：在 [vercel.com](https://vercel.com) 用 GitHub 导入 `Lniosy/who-am-i`，Framework 选 Other，Output Directory 为 `site`（`vercel.json` 已写好）。之后推 `main` 会自动发布。
+静态页在 `site/`。正式站走 [Vercel](https://who-am-i.vercel.app)：用 GitHub 导入仓库即可，`vercel.json` 会把 `site/` 拷进发布目录。之后推 `main` 会自动发布。
 
 GitHub Pages 仍作镜像。
 
