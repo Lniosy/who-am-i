@@ -40,6 +40,7 @@ describe("rules report", () => {
         tools_used: [],
         title: "00000000-0000-4000-8000-000000000001",
         hours: 0.4,
+        windows: [],
       } satisfies SessionEvent,
       {
         tool: "codex",
@@ -54,6 +55,7 @@ describe("rules report", () => {
         tools_used: [],
         title: "写采集器",
         hours: 0.3,
+        windows: [],
       },
     ];
     facts.git = [

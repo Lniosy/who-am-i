@@ -1,9 +1,9 @@
 import { existsSync, statSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { home } from "../paths";
-import { rec, iterJsonl, walkFiles } from "../fsutil";
+import { fileTouchesDay, rec, iterJsonl, walkFiles } from "../fsutil";
 import { asText, clip, displayProject, intish, pickTitle } from "../text";
-import { clusterTimestamps, onDay, parseTs, toIso } from "../time";
+import { clusterFields, onDay, parseTs } from "../time";
 import { emptyTokens, type SessionEvent, type TokenUsage } from "../types";
 
 function grokRoots(): string[] {
@@ -24,6 +24,7 @@ export async function collectGrok(day: string, timeZone: string): Promise<Sessio
       const dir = dirname(summaryPath);
       const sessionId = basename(dir);
       if (!isSessionDirName(sessionId) || seen.has(sessionId)) continue;
+      if (!fileTouchesDay(summaryPath, day, timeZone)) continue;
       seen.add(sessionId);
       const event = await parseSession(dir, sessionId, day, timeZone);
       if (event) sessions.push(event);
@@ -103,22 +104,18 @@ async function parseSession(
 
   if (!times.length) return null;
 
-  const clusters = clusterTimestamps(times);
-  const hours = clusters.reduce((s, c) => s + c.hours, 0);
   const project = displayProject(cwd || basename(dirname(dir)));
   const tokens: TokenUsage = { ...emptyTokens(), input_tokens: maxTokens };
   return {
     tool: "grok-build",
     session_id: sessionId,
     project,
-    started_at: toIso(clusters[0]?.start ?? null),
-    ended_at: toIso(clusters.at(-1)?.end ?? null),
     model,
     tokens,
     user_prompts: prompts.slice(0, 12),
     files_touched: [],
     tools_used: [],
     title: title || pickTitle(prompts, sessionId),
-    hours,
+    ...clusterFields(times),
   };
 }

@@ -7,8 +7,6 @@ import {
   initIdentity,
   initSettings,
   loadIdentity,
-  loadSettings,
-  parseDay,
   reportsDir,
   scanDay,
   settingsPath,
@@ -91,9 +89,10 @@ if (cmd === "who") {
 }
 
 if (cmd === "scan") {
-  const settings = loadSettings();
-  const day = parseDay(arg("--day"), settings.timezone);
-  const facts = await scanDay(day);
+  const facts = await scanDay(arg("--day")).catch((err) => {
+    console.error(err instanceof Error ? err.message : err);
+    process.exit(1);
+  });
   const { saveFacts } = await import("@whoami/core");
   saveFacts(facts);
   console.log(`Who Am I 采集 ${facts.date}`);
@@ -119,7 +118,10 @@ if (cmd === "scan") {
 }
 
 if (cmd === "today") {
-  const report = await collectAndReport(arg("--day"));
+  const report = await collectAndReport(arg("--day")).catch((err) => {
+    console.error(err instanceof Error ? err.message : err);
+    process.exit(1);
+  });
   console.log(report.raw_markdown);
   console.log(`已写入 ${reportsDir()}/${report.date}.md`);
   process.exit(0);
@@ -127,7 +129,10 @@ if (cmd === "today") {
 
 if (cmd === "payload") {
   const { dayPayload } = await import("@whoami/core");
-  const data = await dayPayload(arg("--day"), has("--demo"));
+  const data = await dayPayload(arg("--day"), has("--demo")).catch((err) => {
+    console.error(err instanceof Error ? err.message : err);
+    process.exit(1);
+  });
   console.log(JSON.stringify(data));
   process.exit(0);
 }

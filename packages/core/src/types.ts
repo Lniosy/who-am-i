@@ -18,6 +18,7 @@ export type SessionEvent = {
   tools_used: string[];
   title: string | null;
   hours: number;
+  windows: Array<{ start: string; end: string }>;
 };
 
 export type GitActivity = {
@@ -154,6 +155,15 @@ export function addTokens(a: TokenUsage, b: TokenUsage): TokenUsage {
     output_tokens: a.output_tokens + b.output_tokens,
     cache_read_tokens: a.cache_read_tokens + b.cache_read_tokens,
     cache_write_tokens: a.cache_write_tokens + b.cache_write_tokens,
+  };
+}
+
+export function subTokens(a: TokenUsage, b: TokenUsage): TokenUsage {
+  return {
+    input_tokens: Math.max(0, a.input_tokens - b.input_tokens),
+    output_tokens: Math.max(0, a.output_tokens - b.output_tokens),
+    cache_read_tokens: Math.max(0, a.cache_read_tokens - b.cache_read_tokens),
+    cache_write_tokens: Math.max(0, a.cache_write_tokens - b.cache_write_tokens),
   };
 }
 

@@ -4,7 +4,7 @@ import { Database } from "bun:sqlite";
 import { home } from "../paths";
 import { rec, walkFiles } from "../fsutil";
 import { clip, displayProject, pickTitle } from "../text";
-import { clusterTimestamps, onDay, parseTs, toIso } from "../time";
+import { clusterFields, onDay, parseTs } from "../time";
 import { emptyTokens, type SessionEvent } from "../types";
 
 export async function collectCursor(day: string, timeZone: string): Promise<SessionEvent[]> {
@@ -34,13 +34,10 @@ async function fromMeta(path: string, day: string, timeZone: string): Promise<Se
     if (!times.length) return null;
     const cwd = typeof data.cwd === "string" ? data.cwd : null;
     const sessionId = basename(dirname(path));
-    const clusters = clusterTimestamps(times);
     return {
       tool: "cursor",
       session_id: sessionId,
       project: displayProject(cwd),
-      started_at: toIso(clusters[0]?.start ?? null),
-      ended_at: toIso(clusters.at(-1)?.end ?? null),
       model: typeof data.model === "string" ? data.model : null,
       tokens: emptyTokens(),
       user_prompts: [],
@@ -50,7 +47,7 @@ async function fromMeta(path: string, day: string, timeZone: string): Promise<Se
         [typeof data.title === "string" ? data.title : "", cwd || ""].filter(Boolean),
         sessionId,
       ),
-      hours: clusters.reduce((s, c) => s + c.hours, 0),
+      ...clusterFields(times),
     };
   } catch {
     return null;
@@ -97,14 +94,11 @@ function fromTrackingDb(path: string, day: string, timeZone: string): SessionEve
 
   const out: SessionEvent[] = [];
   for (const [id, bucket] of byConv) {
-    const clusters = clusterTimestamps(bucket.times);
     const file = [...bucket.files][0] || null;
     out.push({
       tool: "cursor",
       session_id: id,
       project: displayProject(file ? dirname(file) : null),
-      started_at: toIso(clusters[0]?.start ?? null),
-      ended_at: toIso(clusters.at(-1)?.end ?? null),
       model: bucket.model,
       tokens: emptyTokens(),
       user_prompts: [],
@@ -114,7 +108,7 @@ function fromTrackingDb(path: string, day: string, timeZone: string): SessionEve
         file ? [basename(file)] : [],
         `Cursor 改了 ${bucket.files.size || bucket.times.length} 处`,
       ),
-      hours: clusters.reduce((s, c) => s + c.hours, 0),
+      ...clusterFields(bucket.times),
     });
   }
   return out;

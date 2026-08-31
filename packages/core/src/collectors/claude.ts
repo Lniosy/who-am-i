@@ -1,16 +1,15 @@
 import { existsSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { home } from "../paths";
-import { iterJsonl, rec } from "../fsutil";
+import { fileTouchesDay, iterJsonl, rec, walkFiles } from "../fsutil";
 import { asText, clip, displayProject, intish, pickTitle } from "../text";
-import { clusterTimestamps, onDay, parseTs, toIso } from "../time";
+import { clusterFields, onDay, parseTs } from "../time";
 import {
   addTokens,
   emptyTokens,
   type SessionEvent,
   type TokenUsage,
 } from "../types";
-import { walkFiles } from "../fsutil";
 
 function claudeRoots(): string[] {
   return [join(home(), ".claude", "projects"), join(home(), ".config", "claude", "projects")];
@@ -22,6 +21,7 @@ export async function collectClaude(day: string, timeZone: string): Promise<Sess
     if (!existsSync(root)) continue;
     const files = await walkFiles(root, (name) => name.endsWith(".jsonl"));
     for (const path of files) {
+      if (!fileTouchesDay(path, day, timeZone)) continue;
       const event = await parseFile(path, day, timeZone);
       if (event) sessions.push(event);
     }
@@ -76,21 +76,17 @@ async function parseFile(path: string, day: string, timeZone: string): Promise<S
   }
 
   if (!times.length) return null;
-  const clusters = clusterTimestamps(times);
-  const hours = clusters.reduce((s, c) => s + c.hours, 0);
   const sessionId = basename(path).replace(/\.jsonl$/, "");
   return {
     tool: "claude-code",
     session_id: sessionId,
     project: displayProject(basename(dirname(path))),
-    started_at: toIso(clusters[0]?.start ?? null),
-    ended_at: toIso(clusters.at(-1)?.end ?? null),
     model,
     tokens: addTokens(tokens, usage),
     user_prompts: prompts.slice(0, 12),
     files_touched: [...files].slice(0, 30),
     tools_used: [...tools].sort(),
     title: pickTitle(prompts, sessionId),
-    hours,
+    ...clusterFields(times),
   };
 }

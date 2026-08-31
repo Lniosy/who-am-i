@@ -11,6 +11,9 @@ describe("titles", () => {
     expect(
       pickTitle(["00000000-0000-4000-8000-000000000001", "把采集器接到日报上"], "x"),
     ).toBe("把采集器接到日报上");
+    expect(
+      pickTitle(["Automation: 每日任务 Automation ID: 1", "把采集器接到日报上"], "x"),
+    ).toBe("把采集器接到日报上");
   });
   test("decode grok project path", () => {
     expect(displayProject("%2FUsers%2Fdemo%2FDocuments%2Fwho-am-i")).toBe("who-am-i");

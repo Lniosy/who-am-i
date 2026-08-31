@@ -43,9 +43,17 @@ export function buildPayload(facts: DayFacts, report: DailyReport | null, demo =
     bucket.tokens = addTokens(bucket.tokens, s.tokens);
     if (s.title) bucket.titles.push(s.title);
     byTool.set(s.tool, bucket);
-    const start = parseTs(s.started_at);
-    const end = parseTs(s.ended_at);
-    if (start && end && end > start) windows.push({ start, end });
+    if (s.windows?.length) {
+      for (const w of s.windows) {
+        const start = parseTs(w.start);
+        const end = parseTs(w.end);
+        if (start && end && end > start) windows.push({ start, end });
+      }
+    } else {
+      const start = parseTs(s.started_at);
+      const end = parseTs(s.ended_at);
+      if (start && end && end > start) windows.push({ start, end });
+    }
   }
 
   const tools: ToolCard[] = [...byTool.entries()].map(([tool, bucket]) => ({

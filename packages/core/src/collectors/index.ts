@@ -5,18 +5,17 @@ import { collectCursor } from "./cursor";
 import { collectGit } from "./git";
 import { collectGrok } from "./grok";
 
-async function runCollector(
+async function safeSessions(
   tool: string,
   fn: () => Promise<SessionEvent[]>,
-  facts: DayFacts,
-): Promise<void> {
+): Promise<{ sessions: SessionEvent[]; error?: { tool: string; message: string } }> {
   try {
-    facts.sessions.push(...(await fn()));
+    return { sessions: await fn() };
   } catch (err) {
-    facts.collector_errors.push({
-      tool,
-      message: err instanceof Error ? err.message : String(err),
-    });
+    return {
+      sessions: [],
+      error: { tool, message: err instanceof Error ? err.message : String(err) },
+    };
   }
 }
 
@@ -26,19 +25,22 @@ export async function collectAll(
   extraGitPaths: string[] = [],
 ): Promise<DayFacts> {
   const facts = emptyFacts(day);
-  await runCollector("claude-code", () => collectClaude(day, timeZone), facts);
-  await runCollector("codex", () => collectCodex(day, timeZone), facts);
-  await runCollector("grok-build", () => collectGrok(day, timeZone), facts);
-  await runCollector("cursor", () => collectCursor(day, timeZone), facts);
-  try {
-    facts.git = await collectGit(day, timeZone, extraGitPaths);
-  } catch (err) {
-    facts.collector_errors.push({
-      tool: "git",
-      message: err instanceof Error ? err.message : String(err),
-    });
-    facts.git = [];
+  const [claude, codex, grok, cursor, git] = await Promise.all([
+    safeSessions("claude-code", () => collectClaude(day, timeZone)),
+    safeSessions("codex", () => collectCodex(day, timeZone)),
+    safeSessions("grok-build", () => collectGrok(day, timeZone)),
+    safeSessions("cursor", () => collectCursor(day, timeZone)),
+    collectGit(day, timeZone, extraGitPaths).then(
+      (rows) => ({ rows, error: null as string | null }),
+      (err) => ({ rows: [], error: err instanceof Error ? err.message : String(err) }),
+    ),
+  ]);
+  for (const part of [claude, codex, grok, cursor]) {
+    facts.sessions.push(...part.sessions);
+    if (part.error) facts.collector_errors.push(part.error);
   }
+  facts.git = git.rows;
+  if (git.error) facts.collector_errors.push({ tool: "git", message: git.error });
   return facts;
 }
 

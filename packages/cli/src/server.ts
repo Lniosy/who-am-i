@@ -39,19 +39,36 @@ export async function serve(host = "127.0.0.1", port = 8787): Promise<void> {
       if (path === "/api/day") {
         const date = url.searchParams.get("date") || undefined;
         const demo = url.searchParams.get("demo") === "1";
-        return json(await dayPayload(date, demo));
+        try {
+          return json(await dayPayload(date, demo));
+        } catch (err) {
+          return json({ error: err instanceof Error ? err.message : String(err) }, 400);
+        }
       }
       if (path === "/api/scan" && req.method === "POST") {
         const date = url.searchParams.get("date") || undefined;
-        const facts = await scanDay(date);
-        const { saveFacts } = await import("@whoami/core");
-        saveFacts(facts);
-        return json({ date: facts.date, sessions: facts.sessions.length, git: facts.git.length, errors: facts.collector_errors });
+        try {
+          const facts = await scanDay(date);
+          const { saveFacts } = await import("@whoami/core");
+          saveFacts(facts);
+          return json({
+            date: facts.date,
+            sessions: facts.sessions.length,
+            git: facts.git.length,
+            errors: facts.collector_errors,
+          });
+        } catch (err) {
+          return json({ error: err instanceof Error ? err.message : String(err) }, 400);
+        }
       }
       if (path === "/api/today" && req.method === "POST") {
         const date = url.searchParams.get("date") || undefined;
-        const report = await collectAndReport(date);
-        return json(await dayPayload(report.date, false));
+        try {
+          const report = await collectAndReport(date);
+          return json(await dayPayload(report.date, false));
+        } catch (err) {
+          return json({ error: err instanceof Error ? err.message : String(err) }, 400);
+        }
       }
       if (path === "/" || path === "/index.html") {
         return new Response(Bun.file(join(WEB_DIR, "index.html")), {

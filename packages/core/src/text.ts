@@ -46,10 +46,10 @@ export function isJunkTitle(text: string): boolean {
 }
 
 export function pickTitle(prompts: string[], fallback: string): string {
-  for (const p of prompts) {
-    if (!isJunkTitle(p)) return clip(p, 80);
-  }
-  return fallback;
+  const clean = prompts.filter((p) => !isJunkTitle(p));
+  const human = clean.filter((p) => !p.startsWith("Automation:"));
+  const pick = human[0] || clean[0];
+  return pick ? clip(pick, 80) : fallback;
 }
 
 export function intish(value: unknown): number {

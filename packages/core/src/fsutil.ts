@@ -1,5 +1,7 @@
+import { statSync } from "node:fs";
 import { readdir } from "node:fs/promises";
 import { join } from "node:path";
+import { onDay } from "./time";
 
 export async function walkFiles(
   root: string,
@@ -51,4 +53,12 @@ export function rec(value: unknown): Record<string, unknown> | null {
   return value && typeof value === "object" && !Array.isArray(value)
     ? (value as Record<string, unknown>)
     : null;
+}
+
+export function fileTouchesDay(path: string, day: string, timeZone: string): boolean {
+  try {
+    return onDay(statSync(path).mtime, day, timeZone);
+  } catch {
+    return false;
+  }
 }

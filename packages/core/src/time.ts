@@ -50,6 +50,19 @@ const DEFAULT_GAP_MS = 8 * 60 * 1000;
 
 export type Window = { start: Date; end: Date; hours: number };
 
+export function clusterFields(timestamps: Date[], gapMs = DEFAULT_GAP_MS) {
+  const clusters = clusterTimestamps(timestamps, gapMs);
+  return {
+    hours: clusters.reduce((s, c) => s + c.hours, 0),
+    started_at: toIso(clusters[0]?.start ?? null),
+    ended_at: toIso(clusters.at(-1)?.end ?? null),
+    windows: clusters.map((c) => ({
+      start: toIso(c.start) as string,
+      end: toIso(c.end) as string,
+    })),
+  };
+}
+
 export function clusterTimestamps(timestamps: Date[], gapMs = DEFAULT_GAP_MS): Window[] {
   if (!timestamps.length) return [];
   const ts = [...timestamps].sort((a, b) => a.getTime() - b.getTime());

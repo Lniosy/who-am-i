@@ -1,9 +1,9 @@
 import { existsSync } from "node:fs";
 import { basename, join } from "node:path";
 import { home } from "../paths";
-import { iterJsonl, rec, walkFiles } from "../fsutil";
+import { fileTouchesDay, iterJsonl, rec, walkFiles } from "../fsutil";
 import { asText, clip, displayProject, intish, pickTitle } from "../text";
-import { clusterTimestamps, onDay, parseTs, toIso } from "../time";
+import { clusterFields, onDay, parseTs } from "../time";
 import { addTokens, emptyTokens, type SessionEvent, type TokenUsage } from "../types";
 
 function codexRoots(): string[] {
@@ -17,6 +17,7 @@ export async function collectCodex(day: string, timeZone: string): Promise<Sessi
     if (!existsSync(root)) continue;
     const files = await walkFiles(root, (name) => name.endsWith(".jsonl"));
     for (const path of files) {
+      if (!fileTouchesDay(path, day, timeZone)) continue;
       const event = await parseFile(path, day, timeZone);
       if (event) sessions.push(event);
     }
@@ -44,6 +45,8 @@ function isUserTurn(kind: string, payload: Record<string, unknown>): boolean {
 
 async function parseFile(path: string, day: string, timeZone: string): Promise<SessionEvent | null> {
   let tokens = emptyTokens();
+  let lastTurn: TokenUsage | null = null;
+  let outputToday = 0;
   const prompts: string[] = [];
   const files = new Set<string>();
   const tools = new Set<string>();
@@ -65,8 +68,17 @@ async function parseFile(path: string, day: string, timeZone: string): Promise<S
 
     if (ts && onDay(ts, day, timeZone)) {
       times.push(ts);
-      const usage = rec(payload.token_usage) || rec(payload.usage) || rec(obj.usage);
-      if (usage) tokens = addTokens(tokens, usageFrom(usage));
+      if (kind === "event_msg" && payload.type === "token_count") {
+        const info = rec(payload.info);
+        const last = rec(info?.last_token_usage);
+        if (last) {
+          lastTurn = usageFrom(last);
+          outputToday += lastTurn.output_tokens;
+        }
+      } else {
+        const usage = rec(payload.token_usage) || rec(payload.usage) || rec(obj.usage);
+        if (usage) tokens = addTokens(tokens, usageFrom(usage));
+      }
       if (isUserTurn(kind, payload)) {
         const text = asText(payload.text ?? payload.content ?? obj.text);
         if (text) prompts.push(clip(text));
@@ -81,20 +93,19 @@ async function parseFile(path: string, day: string, timeZone: string): Promise<S
   }
 
   if (!times.length) return null;
-  const clusters = clusterTimestamps(times);
-  const hours = clusters.reduce((s, c) => s + c.hours, 0);
+  if (lastTurn) {
+    tokens = { ...lastTurn, output_tokens: outputToday };
+  }
   return {
     tool: "codex",
     session_id: sessionId,
     project: displayProject(cwd) || displayProject(basename(path)),
-    started_at: toIso(clusters[0]?.start ?? null),
-    ended_at: toIso(clusters.at(-1)?.end ?? null),
     model,
     tokens,
     user_prompts: prompts.slice(0, 12),
     files_touched: [...files].slice(0, 30),
     tools_used: [...tools].sort(),
     title: pickTitle(prompts, sessionId),
-    hours,
+    ...clusterFields(times),
   };
 }
