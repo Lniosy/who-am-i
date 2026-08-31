@@ -2,7 +2,7 @@
 
 **看清自己每天在做什么。不必焦虑。知道自己到底有没有为之努力。**
 
-官网：[lniosy.github.io/who-am-i](https://lniosy.github.io/who-am-i/)
+官网：[who-am-i.vercel.app](https://who-am-i.vercel.app)（GitHub Pages 镜像：[lniosy.github.io/who-am-i](https://lniosy.github.io/who-am-i/)）
 
 Who Am I 是一个 **local-first** 的开源自我认知工具。它读取你电脑上已经存在的 AI 编程工具痕迹（Grok Build、Cursor、Codex、Claude Code），再加上 Git 提交，在每天结束时写成一份人话日报：
 
@@ -173,6 +173,12 @@ Who Am I **不打算**再实现一遍 20 个工具的 token 解析精度。欢�
 如果你想少一点自我攻击，用这个。
 
 ---
+
+## 官网
+
+静态页在 `site/`。正式站走 [Vercel](https://who-am-i.vercel.app)：在 [vercel.com](https://vercel.com) 用 GitHub 导入 `Lniosy/who-am-i`，Framework 选 Other，Output Directory 为 `site`（`vercel.json` 已写好）。之后推 `main` 会自动发布。
+
+GitHub Pages 仍作镜像。
 
 ## 贡献
 

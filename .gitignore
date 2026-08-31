@@ -20,3 +20,4 @@ reports/
 /identity.yaml
 /settings.yaml
 scripts/tmp/
+.vercel
