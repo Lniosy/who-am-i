@@ -2,71 +2,174 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Who Am I · 日报</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#F5F5F7" />
+  <title>Who Am I</title>
   <style>
     :root {
-      --bg: #f4efe6;
-      --paper: #fffaf3;
-      --ink: #1c1915;
-      --muted: #6f675c;
-      --line: #e6ddd0;
-      --good: #3c6e50;
-      --warm: #c45c26;
+      --bg: #f5f5f7;
+      --surface: rgba(255, 255, 255, 0.72);
+      --surface-solid: #ffffff;
+      --ink: #1d1d1f;
+      --muted: #6e6e73;
+      --line: rgba(60, 60, 67, 0.12);
+      --fill: rgba(120, 120, 128, 0.12);
+      --blue: #0071e3;
+      --blue-press: #0077ed;
+      --green: #248a3d;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
+      --radius: 18px;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #000000;
+        --surface: rgba(28, 28, 30, 0.72);
+        --surface-solid: #1c1c1e;
+        --ink: #f5f5f7;
+        --muted: #98989d;
+        --line: rgba(84, 84, 88, 0.48);
+        --fill: rgba(120, 120, 128, 0.24);
+        --blue: #0a84ff;
+        --green: #30d158;
+        --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 32px rgba(0, 0, 0, 0.35);
+      }
     }
     * { box-sizing: border-box; }
-    html, body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 "Iowan Old Style", "Palatino Linotype", Palatino, "Songti SC", serif; }
-    .wrap { max-width: 1120px; margin: 0 auto; padding: 32px 24px 80px; }
-    header.top { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
-    .brand { font-size: 13px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
-    h1 { font-size: 34px; font-weight: 600; margin: 4px 0 0; letter-spacing: -.02em; }
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font);
+      font-size: 17px;
+      line-height: 1.47;
+      letter-spacing: -0.022em;
+      -webkit-font-smoothing: antialiased;
+    }
+    button { font-family: inherit; }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 22px 88px; }
+    header.top {
+      position: sticky; top: 0; z-index: 20;
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 16px; flex-wrap: wrap;
+      margin: 0 -22px 28px; padding: 14px 22px 12px;
+      background: var(--surface);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+    }
+    .brand {
+      font-size: 13px; font-weight: 590; color: var(--muted);
+      letter-spacing: 0.02em;
+    }
+    h1 {
+      font-size: 34px; font-weight: 700; margin: 2px 0 0;
+      letter-spacing: -0.03em; line-height: 1.1;
+    }
     .controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-    button, select, input[type=date] {
-      border: 1px solid var(--line); background: var(--paper); color: var(--ink);
-      border-radius: 999px; padding: 8px 14px; font: 14px/1 ui-sans-serif, system-ui, sans-serif;
-      cursor: pointer;
+    input[type=date], button {
+      appearance: none; border: 0; cursor: pointer;
+      background: var(--fill); color: var(--ink);
+      border-radius: 980px; padding: 8px 14px;
+      font-size: 13px; font-weight: 590; letter-spacing: -0.01em;
+      transition: transform 100ms ease-out, opacity 100ms ease-out, background-color 160ms ease;
     }
-    button.active { background: var(--ink); color: var(--paper); }
-    button:disabled { opacity: .5; cursor: wait; }
+    input[type=date] { padding: 7px 12px; }
+    button:hover { background: rgba(120, 120, 128, 0.2); }
+    button:active, input[type=date]:active { transform: scale(0.97); }
+    button.active { background: var(--ink); color: var(--bg); }
+    button.primary { background: var(--blue); color: #fff; }
+    button.primary:hover { background: var(--blue-press); }
+    button:disabled { opacity: .45; cursor: wait; }
+    .seg {
+      display: flex; padding: 2px; border-radius: 10px; background: var(--fill);
+    }
+    .seg button {
+      border-radius: 8px; padding: 6px 12px; background: transparent;
+    }
+    .seg button.active {
+      background: var(--surface-solid); color: var(--ink);
+      box-shadow: 0 1px 3px rgba(0,0,0,.12);
+    }
     .banner {
-      background: #efe4d2; border: 1px dashed #d3c3a8; border-radius: 14px;
-      padding: 10px 14px; font: 13px/1.4 ui-sans-serif, system-ui, sans-serif;
-      color: var(--muted); margin-bottom: 18px;
+      background: var(--fill); border-radius: 12px;
+      padding: 11px 14px; font-size: 13px; color: var(--muted);
+      margin-bottom: 18px; letter-spacing: 0;
     }
-    .hero {
-      background: var(--paper); border: 1px solid var(--line); border-radius: 20px;
-      padding: 28px; margin-bottom: 18px;
+    .hero, .tool, .card {
+      background: var(--surface-solid);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
     }
-    .hero .kicker { font: 12px ui-sans-serif, system-ui; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
-    .hero h2 { font-size: 28px; margin: 8px 0 12px; }
-    .meta { display: flex; gap: 18px; flex-wrap: wrap; color: var(--muted); font: 14px ui-sans-serif, system-ui; }
-    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 18px 0 8px; }
-    .stat { background: #f7f1e7; border-radius: 14px; padding: 14px 16px; }
-    .stat b { display: block; font-size: 22px; font-family: ui-sans-serif, system-ui; }
-    .stat span { color: var(--muted); font: 12px ui-sans-serif, system-ui; }
-    .tools { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 18px 0; }
-    .tool { background: var(--paper); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; }
-    .tool-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .hero { padding: 28px 28px 22px; margin-bottom: 16px; }
+    .kicker {
+      font-size: 12px; font-weight: 590; color: var(--muted);
+      letter-spacing: 0.02em;
+    }
+    .hero h2 {
+      font-size: 28px; font-weight: 700; margin: 8px 0 10px;
+      letter-spacing: -0.025em; line-height: 1.15;
+    }
+    .meta { color: var(--muted); font-size: 15px; }
+    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 22px 0 0; }
+    .stat {
+      background: var(--fill); border-radius: 14px; padding: 14px 16px;
+    }
+    .stat b {
+      display: block; font-size: 28px; font-weight: 700;
+      letter-spacing: -0.03em; line-height: 1.1;
+    }
+    .stat span { color: var(--muted); font-size: 12px; font-weight: 510; letter-spacing: 0; }
+    .tools { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 16px 0; }
+    .tool { padding: 18px 18px 16px; }
+    .tool-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
     .icon { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; }
-    .icon svg { width: 20px; height: 20px; }
-    .tool h3 { margin: 0; font-size: 17px; }
-    .bar { height: 8px; background: #efe6d8; border-radius: 99px; overflow: hidden; margin: 8px 0; }
+    .icon svg { width: 18px; height: 18px; }
+    .tool h3 { margin: 0; font-size: 17px; font-weight: 590; letter-spacing: -0.022em; }
+    .bar { height: 4px; background: var(--fill); border-radius: 99px; overflow: hidden; margin: 8px 0; }
     .bar > i { display: block; height: 100%; border-radius: 99px; }
-    .nums { display: flex; gap: 14px; font: 13px ui-sans-serif, system-ui; color: var(--muted); }
-    .cols { display: grid; grid-template-columns: 1.2fr .8fr; gap: 12px; }
-    .card { background: var(--paper); border: 1px solid var(--line); border-radius: 18px; padding: 20px; }
-    .card h3 { margin: 0 0 12px; font-size: 16px; }
-    ul { margin: 0; padding-left: 18px; }
-    li { margin: 6px 0; }
-    .timeline { display: flex; flex-direction: column; gap: 10px; }
-    .row { display: grid; grid-template-columns: 88px 1fr auto; gap: 10px; align-items: center; font: 13px ui-sans-serif, system-ui; }
-    .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 8px; }
-    .align { font-size: 17px; }
-    .effort { color: var(--good); }
-    footer { margin-top: 28px; color: var(--muted); font: 12px ui-sans-serif, system-ui; }
+    .nums { display: flex; gap: 14px; font-size: 13px; color: var(--muted); letter-spacing: 0; }
+    .cols { display: grid; grid-template-columns: 1.15fr .85fr; gap: 12px; }
+    .card { padding: 22px 22px 18px; }
+    .card h3 {
+      margin: 0 0 14px; font-size: 13px; font-weight: 590;
+      color: var(--muted); letter-spacing: 0.01em;
+    }
+    .card h3 + h3 { margin-top: 22px; }
+    ul { margin: 0; padding: 0; list-style: none; }
+    li {
+      margin: 0; padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+      font-size: 15px; letter-spacing: -0.016em;
+    }
+    li:last-child { border-bottom: 0; }
+    .timeline { display: flex; flex-direction: column; }
+    .row {
+      display: grid; grid-template-columns: 56px 1fr auto; gap: 10px;
+      align-items: center; font-size: 15px;
+      padding: 10px 0; border-bottom: 1px solid var(--line);
+    }
+    .row:last-child { border-bottom: 0; }
+    .row time { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 13px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+    .align { font-size: 21px; font-weight: 590; letter-spacing: -0.022em; line-height: 1.3; margin: 0 0 10px; }
+    .effort { color: var(--green); margin: 0 0 8px; font-size: 15px; }
+    footer {
+      margin-top: 36px; color: var(--muted);
+      font-size: 12px; letter-spacing: 0; line-height: 1.5;
+    }
+    @media (prefers-reduced-transparency: reduce) {
+      header.top { background: var(--surface-solid); backdrop-filter: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      button, input[type=date] { transition: none; }
+    }
     @media (max-width: 860px) {
       .grid, .tools, .cols { grid-template-columns: 1fr; }
       .row { grid-template-columns: 1fr; }
+      h1 { font-size: 28px; }
+      .hero h2 { font-size: 24px; }
     }
   </style>
 </head>
@@ -79,9 +182,11 @@
       </div>
       <div class="controls">
         <input type="date" id="date" />
-        <button id="scanBtn" type="button">生成本机日报</button>
-        <button id="liveBtn" type="button" class="active">本机数据</button>
-        <button id="demoBtn" type="button">示例日</button>
+        <button id="scanBtn" class="primary" type="button">生成本机日报</button>
+        <div class="seg">
+          <button id="liveBtn" type="button" class="active">本机</button>
+          <button id="demoBtn" type="button">示例</button>
+        </div>
       </div>
     </header>
     <div id="banner" class="banner">正在读取本机数据。</div>
@@ -90,7 +195,7 @@
       <h2 id="headline">…</h2>
       <div class="meta" id="meta"></div>
       <div class="grid">
-        <div class="stat"><b id="sHours">—</b><span>有痕迹的时长（并行只计一次）</span></div>
+        <div class="stat"><b id="sHours">—</b><span>有痕迹的时长</span></div>
         <div class="stat"><b id="sSessions">—</b><span>AI 会话</span></div>
         <div class="stat"><b id="sTokens">—</b><span>Tokens</span></div>
         <div class="stat"><b id="sCommits">—</b><span>Git 提交</span></div>
@@ -105,11 +210,11 @@
       <div class="card">
         <h3>今天做完了什么</h3>
         <ul id="finished"></ul>
-        <h3 style="margin-top:18px">留下的痕迹</h3>
+        <h3>留下的痕迹</h3>
         <ul id="traces"></ul>
-        <h3 style="margin-top:18px">不必担心什么</h3>
+        <h3>不必担心什么</h3>
         <ul id="worry"></ul>
-        <h3 style="margin-top:18px">明天先做什么</h3>
+        <h3>明天先做什么</h3>
         <ul id="tomorrow"></ul>
       </div>
     </section>
@@ -118,14 +223,14 @@
         <h3>和我想要的东西对齐吗</h3>
         <p class="align" id="alignment"></p>
         <p class="effort" id="effort"></p>
-        <p id="star" style="color:var(--muted)"></p>
+        <p id="star" style="color:var(--muted); margin:0; font-size:15px"></p>
       </div>
       <div class="card">
         <h3>Git</h3>
         <div id="git"></div>
       </div>
     </section>
-    <footer>数据默认留在本机。示例日是样例，用来展示面板，不是你的隐私。时长按会话里的时间戳聚类，不是墙钟首尾相减。</footer>
+    <footer>数据默认留在本机。示例日用来展示面板，不是你的隐私。时长按会话时间戳聚类，并行时段只计一次。</footer>
   </div>
   <script>
     const ICONS = {
@@ -188,10 +293,10 @@
         </article>`).join("");
       document.getElementById("timeline").innerHTML = (data.timeline || []).map((r) => `
         <div class="row">
-          <div>${esc(fmtTime(r.start))}</div>
+          <time>${esc(fmtTime(r.start))}</time>
           <div><span class="dot" style="background:${esc(r.accent)}"></span>${esc(r.label)} · ${esc(r.title)}</div>
           <div>${Number(r.hours).toFixed(1)}h</div>
-        </div>`).join("") || "还没有时间窗";
+        </div>`).join("") || "<div class='row'>还没有时间窗</div>";
       list(document.getElementById("finished"), report.finished);
       list(document.getElementById("traces"), report.traces);
       list(document.getElementById("worry"), report.do_not_worry);
@@ -200,14 +305,14 @@
       document.getElementById("effort").textContent = report.effort_note || "";
       document.getElementById("star").textContent = (data.identity && data.identity.north_star) || "";
       document.getElementById("git").innerHTML = (data.git || []).map((g) =>
-        `<p><b>${esc(g.repo)}</b> · ${g.commits} 次提交 · +${g.insertions} / −${g.deletions}</p>
+        `<p style="margin:0 0 8px"><b>${esc(g.repo)}</b> · ${g.commits} 次提交 · +${g.insertions} / −${g.deletions}</p>
          <ul>${(g.messages || []).map((m) => `<li>${esc(m)}</li>`).join("")}</ul>`
-      ).join("") || "<p>今天没有提交。</p>";
+      ).join("") || "<p style='margin:0;color:var(--muted)'>今天没有提交。</p>";
       const banner = document.getElementById("banner");
       const errors = (data.collector_errors || []).map((e) => e.tool + "：" + e.message).join("；");
       if (data.demo) {
         banner.style.display = "block";
-        banner.textContent = "这是写进产品里的示例日。点「本机数据」或「生成本机日报」看你自己的一天。";
+        banner.textContent = "这是写进产品里的示例日。点「本机」或「生成本机日报」看你自己的一天。";
       } else if (empty) {
         banner.style.display = "block";
         banner.textContent = (data.requested || data.date) + " 还没有日报。点「生成本机日报」采集并写一份。";
