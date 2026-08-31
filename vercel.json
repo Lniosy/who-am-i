@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
   "installCommand": "echo skip",
-  "buildCommand": "mkdir -p public && if [ -f site/index.html ]; then cp -R site/. public/; elif [ -f index.html ]; then cp index.html 404.html dashboard-preview.jpg public/; else echo 'PWD='$(pwd) && ls -la && exit 1; fi",
+  "buildCommand": "bash /vercel/path0/scripts/vercel-build.sh || bash ../../scripts/vercel-build.sh || bash scripts/vercel-build.sh",
   "outputDirectory": "public",
   "cleanUrls": true,
   "trailingSlash": false
